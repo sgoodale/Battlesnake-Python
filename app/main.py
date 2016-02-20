@@ -36,32 +36,22 @@ def start():
 def move():
     data = bottle.request.json
    
-   snakes = data.get('snakes')
-   mySnake = None
-   action = None
+    snakes = data.get('snakes')
+    mySnake = None
+    action = None
     for snake in snakes:
         if snake.get('id') == "7b6a3593-5ccf-49dc-ac1c-2108793bcac6":
             mySnake = snake
-    
     
     if mySnake.get('age') > 2:
         action = 'north'
     else:
         action = 'west'
-        
-
-    #for i in range(0,len(data.get('snakes'))):
-        #if data.get('snakes'[0]('age')):
-    
-    #tester
-    #if bottle.request.snakes == 
     
     # TODO: Do things with data
     dirs = ['east', 'north', 'west', 'south']
     
     return {  
-        
-        
       'move': action,
       'taunt': 'moving east'
     }
