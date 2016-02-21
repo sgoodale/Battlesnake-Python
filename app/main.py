@@ -1,6 +1,7 @@
 import bottle
 import os
 import random
+import math
 
 
 @bottle.route('/static/<path:path>')
@@ -16,7 +17,7 @@ def index():
     )
     
     return {
-        'color': 'orange',
+        'color': 'pink',
         'head': head_url
     }
 
@@ -25,35 +26,140 @@ def index():
 def start():
     data = bottle.request.json
     
-    # TODO: Josh edits
-
     return {
-        'taunt': 'MOTHAFUCKA'
+        'taunt': 'LEt ER RIP!!!'
     }
 # https://jordanjaytester.herokuapp.com
 
-@bottle.post('/move')
-def move():
+def closestFood(): 
     data = bottle.request.json
-   
+    
     snakes = data.get('snakes')
+    food = [None]*2
     mySnake = None
+    mySnakeHead = None
+    mySnakeTail = None
     action = None
     for snake in snakes:
         if snake.get('id') == "7b6a3593-5ccf-49dc-ac1c-2108793bcac6":
             mySnake = snake
+            
+    myCoords = mySnake.get('coords')
+    mySnakeHead = myCoords[0]
+    snakex = mySnakeHead[0]
+    snakey = mySnakeHead[1]
     
-    if mySnake.get('age') > 2:
-        action = 'north'
+    foodCoords = data.get('food')
+    minim = data.get('height') + data.get('width')
+    for i in range(0,len(foodCoords)-1):
+        currFood = foodCoords[i]
+        x = currFood[0]
+        y = currFood[1]
+        coldif = abs(x - snakex)
+        rowdif = abs(y - snakey)
+        distance = coldif + rowdif
+        if distance <= minim:
+            minim = distance
+            food = [x,y]
+    return food
+
+    
+def moveToFood():
+    data = bottle.request.json   
+    moveToDo = None
+    
+    snakes = data.get('snakes')
+    mySnake = None
+    dangerZone = []
+    for snake in snakes:
+        if snake.get('id') == "7b6a3593-5ccf-49dc-ac1c-2108793bcac6":
+            mySnake = snake
+        dangerZone = dangerZone + snake.get('coords')
+            
+        
+    
+    foodToGetCoords = closestFood()
+    snakeHeadCoords = getInitSnakeCoords()
+    foodX = foodToGetCoords[0]
+    foodY = foodToGetCoords[1]
+    snakeX = snakeHeadCoords[0]
+    snakeY = snakeHeadCoords[1]
+    difX = abs(foodX-snakeX)
+    difY = abs(foodY-snakeY)
+    difX = int(difX)
+    difY = int(difY)
+    distance = difX + difY
+    print foodToGetCoords
+    print snakeHeadCoords
+    futurePosition = None
+    if snakeX <= foodX and mySnake.get('message') != 'Moved west':
+        futurePosition = [snakeX+1,snakeY]
+        if futurePosition not in dangerZone:
+            moveToDo = 'east'
+            return moveToDo
+    if snakeX > foodX and mySnake.get('message') != 'Moved east':
+        futurePosition = [snakeX-1,snakeY]
+        if futurePosition not in dangerZone:
+            moveToDo = 'west'
+            return moveToDo            
+    if snakeY <= foodY and mySnake.get('message') != 'Moved north':
+        futurePosition = [snakeX,snakeY+1]
+        if futurePosition not in dangerZone:
+            moveToDo = 'south'
+            return moveToDo            
+    if snakeY > foodY and mySnake.get('message') != 'Moved south':
+        futurePosition = [snakeX,snakeY-1]
+        if futurePosition not in dangerZone:        
+            moveToDo = 'north'
+            return moveToDo                
+    if moveToDo == None:
+        futurePosition = [snakeX+1,snakeY]
+        if futurePosition not in dangerZone:
+            return 'east'        
+        futurePosition = [snakeX-1,snakeY]
+        if futurePosition not in dangerZone:
+            return 'west'
+        futurePosition = [snakeX,snakeY+1]
+        if futurePosition not in dangerZone:
+            return 'south'
+        futurePosition = [snakeX,snakeY-1]
+        if futurePosition not in dangerZone:        
+            return 'north'
+    if snakeX == 0:
+        return 'north'
+    if snakeX == 17:
+        return 'south'
+    if snakeY == 0:
+        return 'east'
+    if snakeY == 17:
+        return 'west'
     else:
-        action = 'west'
+        return None
     
-    # TODO: Do things with data
-    dirs = ['east', 'north', 'west', 'south']
+def getInitSnakeCoords():
+    data = bottle.request.json    
+    mySnake = None
+    mySnakeHead = None
+    mySnakeTail = None    
+    snakes = data.get('snakes')
+    for snake in snakes:
+        if snake.get('id') == "7b6a3593-5ccf-49dc-ac1c-2108793bcac6":
+            mySnake = snake
+            
+    myCoords = mySnake.get('coords')
+    mySnakeHead = myCoords[0]    
+    mySnakeTail = myCoords[len(myCoords)-1]
+    return mySnakeHead
+
+@bottle.post('/move')
+def move():
+    data = bottle.request.json
+    action = None
+    action = moveToFood()
     
     return {  
       'move': action,
-      'taunt': 'moving east'
+      'taunt': "OH YEAHHHH"
     }
 
 
@@ -64,7 +170,7 @@ def end():
     # TODO: Do things with data
 
     return {
-        'taunt': 'battlesnake-python!'
+        'taunt': 'GOOD GAME!!!! '
     }
 
 
