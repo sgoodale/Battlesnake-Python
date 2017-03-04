@@ -1,58 +1,52 @@
 import bottle
 import os
 import random
-import math
 
-
-def ID = 0
 
 @bottle.route('/static/<path:path>')
 def static(path):
     return bottle.static_file(path, root='static/')
 
-@bottle.get('/')
-def index():
-    head_url = '%s://%s/static/head.png' % (
-	#head_url = 'http://placecage/com/c/100/100' % (
-        bottle.request.urlparts.scheme,
-        bottle.request.urlparts.netloc
-    )
-    
-    return {
-        'color': 'gold',
-        'head': head_url
-    }
-
 
 @bottle.post('/start')
 def start():
     data = bottle.request.json
-    ID = data['game_id']
-    return {
-        'color': 'gold',
-        'name': 'Dream_Team_Swag_Snake_Team_Of_Dreams'
-        'taunt': 'Existence is pain',
-        'head_type': 'sand-worm',
-        'tail_type': 'skinny-tail',
-        'game_id': ID
-    }
-    
+    game_id = data['game_id']
+    board_width = data['width']
+    board_height = data['height']
 
-def closestFood(): 
+    head_url = '%s://%s/static/head.png' % (
+        bottle.request.urlparts.scheme,
+        bottle.request.urlparts.netloc
+    )
+
+    # TODO: Do things with data
+
+    return {
+        'color': '#00FF00',
+        'taunt': '{} ({}x{})'.format(game_id, board_width, board_height),
+        'head_url': head_url,
+        'name': 'battlesnake-python'
+    }
+
+
+@bottle.post('/move')
+def move():
     data = bottle.request.json
-    
-    snakes = data.get('snakes')
-    food = [None]*2
-    mySnake = None
-    mySnakeHead = None
-    mySnakeTail = None
-    action = None
-    for snake in snakes:
-        if snake.get('id') == "7b6a3593-5ccf-49dc-ac1c-2108793bcac6":
-            mySnake = snake
-            
-    myCoords = mySnake.get('coords')
-    mySnakeHead = myCoords[0]
+
+    # TODO: Do things with data
+    directions = ['up', 'down', 'left', 'right']
+
+    return {
+        'move': random.choice(directions),
+        'taunt': 'battlesnake-python!'
+    }
+
+
+# Expose WSGI app (so gunicorn can find it)
+application = bottle.default_app()
+if __name__ == '__main__':
+bottle.run(application, host=os.getenv('IP', '0.0.0.0'), port=os.getenv('PORT', '8080'))
     snakex = mySnakeHead[0]
     snakey = mySnakeHead[1]
     
