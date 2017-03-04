@@ -4,20 +4,22 @@ import random
 import math
 
 
+def ID = 0
+
 @bottle.route('/static/<path:path>')
 def static(path):
     return bottle.static_file(path, root='static/')
 
-
 @bottle.get('/')
 def index():
     head_url = '%s://%s/static/head.png' % (
+	#head_url = 'http://placecage/com/c/100/100' % (
         bottle.request.urlparts.scheme,
         bottle.request.urlparts.netloc
     )
     
     return {
-        'color': 'pink',
+        'color': 'gold',
         'head': head_url
     }
 
@@ -25,11 +27,16 @@ def index():
 @bottle.post('/start')
 def start():
     data = bottle.request.json
-    
+    ID = data['game_id']
     return {
-        'taunt': 'LEt ER RIP!!!'
+        'color': 'gold',
+        'name': 'Dream_Team_Swag_Snake_Team_Of_Dreams'
+        'taunt': 'Existence is pain',
+        'head_type': 'sand-worm',
+        'tail_type': 'skinny-tail',
+        'game_id': ID
     }
-# https://jordanjaytester.herokuapp.com
+    
 
 def closestFood(): 
     data = bottle.request.json
